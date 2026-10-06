@@ -1,0 +1,9 @@
+{
+  "appId": "com.luveria.app",
+  "appName": "LUVERIA",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "https"
+  }
+}

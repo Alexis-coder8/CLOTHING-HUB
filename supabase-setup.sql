@@ -22,16 +22,19 @@ create table if not exists public.community_comments (
 alter table public.community_looks enable row level security;
 alter table public.community_comments enable row level security;
 
-grant select, insert on public.community_looks to anon, authenticated;
-grant select, insert on public.community_comments to anon, authenticated;
+grant select on public.community_looks to anon, authenticated;
+grant insert on public.community_looks to authenticated;
+grant select on public.community_comments to anon, authenticated;
+grant insert on public.community_comments to authenticated;
 
 drop policy if exists "Anyone can view community looks" on public.community_looks;
 create policy "Anyone can view community looks"
   on public.community_looks for select to anon, authenticated using (true);
 
 drop policy if exists "Anyone can share community looks" on public.community_looks;
-create policy "Anyone can share community looks"
-  on public.community_looks for insert to anon, authenticated with check (
+drop policy if exists "Authenticated users can share community looks" on public.community_looks;
+create policy "Authenticated users can share community looks"
+  on public.community_looks for insert to authenticated with check (
     char_length(display_name) between 1 and 40
     and char_length(title) between 1 and 80
   );
@@ -41,8 +44,9 @@ create policy "Anyone can view community comments"
   on public.community_comments for select to anon, authenticated using (true);
 
 drop policy if exists "Anyone can post community comments" on public.community_comments;
-create policy "Anyone can post community comments"
-  on public.community_comments for insert to anon, authenticated with check (
+drop policy if exists "Authenticated users can post community comments" on public.community_comments;
+create policy "Authenticated users can post community comments"
+  on public.community_comments for insert to authenticated with check (
     char_length(display_name) between 1 and 40
     and char_length(body) between 1 and 300
   );
@@ -59,5 +63,6 @@ create policy "Anyone can view shared look pictures"
   on storage.objects for select to anon, authenticated using (bucket_id = 'luveria-looks');
 
 drop policy if exists "Anyone can upload shared look pictures" on storage.objects;
-create policy "Anyone can upload shared look pictures"
-  on storage.objects for insert to anon, authenticated with check (bucket_id = 'luveria-looks');
+drop policy if exists "Authenticated users can upload shared look pictures" on storage.objects;
+create policy "Authenticated users can upload shared look pictures"
+  on storage.objects for insert to authenticated with check (bucket_id = 'luveria-looks');

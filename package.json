@@ -1,0 +1,18 @@
+{
+  "name": "luveria",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.js",
+    "android": "npm run build && cap sync android",
+    "ios": "npm run build && cap sync ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/ios": "^8.5.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.4.3"
+  }
+}

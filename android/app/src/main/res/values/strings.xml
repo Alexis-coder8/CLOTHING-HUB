@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">LUVERIA</string>
+    <string name="title_activity_main">LUVERIA</string>
+    <string name="package_name">com.luveria.app</string>
+    <string name="custom_url_scheme">com.luveria.app</string>
+</resources>

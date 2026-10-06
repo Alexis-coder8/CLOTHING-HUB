@@ -7,7 +7,9 @@
     name="description"
     content="Explore elegant, African, corporate, casual, feminine, old money, university, romantic, streetwear, and cozy fashion inspiration at LUVERIA."
   >
+  <meta name="theme-color" content="#321740">
   <title>LUVERIA | Find Your Style</title>
+  <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -43,8 +45,37 @@
       >
         ♡ <span>Saved pictures</span>
       </button>
+      <button class="account-toggle" id="account-toggle" type="button">Sign in</button>
     </div>
   </header>
+
+  <dialog class="auth-dialog" id="auth-dialog" aria-labelledby="auth-title">
+    <form class="auth-form" id="auth-form">
+      <button class="auth-close" id="auth-close" type="button" aria-label="Close sign-in dialog">×</button>
+      <p class="eyebrow">Your LUVERIA account</p>
+      <h2 id="auth-title">Sign in</h2>
+      <p class="auth-description">Sign in to your account or create one to join LUVERIA.</p>
+      <label>
+        Email
+        <input name="email" type="email" autocomplete="email" maxlength="254" required>
+      </label>
+      <label>
+        Password
+        <input name="password" type="password" autocomplete="current-password" minlength="8" required>
+      </label>
+      <button class="community-submit" id="auth-submit" type="submit">Sign in</button>
+      <button class="auth-mode-toggle" id="auth-mode-toggle" type="button">Create an account</button>
+      <p class="auth-status" id="auth-status" aria-live="polite"></p>
+    </form>
+    <div class="auth-signed-in" id="auth-signed-in" hidden>
+      <button class="auth-close" id="auth-close-account" type="button" aria-label="Close account dialog">×</button>
+      <p class="eyebrow">Your LUVERIA account</p>
+      <h2 id="auth-account-title">You are signed in</h2>
+      <p id="auth-email"></p>
+      <button class="community-submit" id="auth-sign-out" type="button">Sign out</button>
+      <p class="auth-status" id="auth-account-status" aria-live="polite"></p>
+    </div>
+  </dialog>
 
   <main>
     <section class="hero" id="home">
@@ -607,8 +638,8 @@
           </select>
         </label>
         <label class="upload-file">
-          Picture (JPG, PNG, or WebP; max 5 MB)
-          <input name="image" type="file" accept="image/jpeg,image/png,image/webp" required>
+          Picture (JPEG, PNG, or WebP; max 5 MB)
+          <input name="image" type="file" accept="image/jpeg,.jpg,.jpeg,image/png,.png,image/webp,.webp" required>
         </label>
         <button class="community-submit" type="submit">Share your look</button>
       </form>
@@ -635,5 +666,10 @@
 
   <script src="js/supabase-config.js"></script>
   <script src="js/script.js"></script>
+  <script>
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js"));
+    }
+  </script>
 </body>
 </html>

@@ -9,7 +9,16 @@
   const pinGrid = document.getElementById("pin-grid");
   const uploadForm = document.getElementById("upload-form");
   const communityStatus = document.getElementById("community-status");
+  const accountToggle = document.getElementById("account-toggle");
+  const authDialog = document.getElementById("auth-dialog");
+  const authForm = document.getElementById("auth-form");
+  const authSignedIn = document.getElementById("auth-signed-in");
+  const authModeToggle = document.getElementById("auth-mode-toggle");
+  const authSubmit = document.getElementById("auth-submit");
+  const authStatus = document.getElementById("auth-status");
+  const authAccountStatus = document.getElementById("auth-account-status");
   const savedStorageKey = "chicVerseSavedImages";
+  const authStorageKey = "luveriaAuthSession";
   const localDatabaseName = "luveria-community";
   const supabaseUrl = window.LUVERIA_SUPABASE_URL.replace(/\/+$/, "");
   const supabaseKey = window.LUVERIA_SUPABASE_ANON_KEY;
@@ -23,6 +32,161 @@
   let sharedComments = [];
   let storageWarning = "";
   let localDatabasePromise;
+  let authSession = null;
+  let authMode = "signin";
+  let pendingCommunityAction = null;
+
+  function showAuthStatus(message, isError = false) {
+    const target = authSession ? authAccountStatus : authStatus;
+    target.textContent = message;
+    target.classList.toggle("is-error", isError);
+  }
+
+  function updateAuthUi() {
+    accountToggle.textContent = authSession ? "Account" : "Sign in";
+    authForm.hidden = Boolean(authSession);
+    authSignedIn.hidden = !authSession;
+    if (authSession) {
+      document.getElementById("auth-email").textContent = authSession.user.email;
+      return;
+    }
+    const signingUp = authMode === "signup";
+    document.getElementById("auth-title").textContent = signingUp ? "Create your account" : "Sign in";
+    authSubmit.textContent = signingUp ? "Create account" : "Sign in";
+    authModeToggle.textContent = signingUp ? "Already have an account? Sign in" : "Create an account";
+    authForm.elements.password.autocomplete = signingUp ? "new-password" : "current-password";
+    authStatus.textContent = "";
+    authStatus.classList.remove("is-error");
+  }
+
+  async function requestAuth(path, payload, accessToken = supabaseKey) {
+    const response = await fetch(`${supabaseUrl}${path}`, {
+      method: "POST",
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+    const body = await response.text();
+    let result;
+    try {
+      result = body ? JSON.parse(body) : null;
+    } catch {
+      throw new Error(`Authentication returned an unreadable response (${response.status}).`);
+    }
+    if (!response.ok) {
+      throw new Error(result?.msg || result?.message || result?.error_description || result?.error || `Authentication failed (${response.status}).`);
+    }
+    return result;
+  }
+
+  function setAuthSession(session) {
+    if (!session?.access_token || !session.user?.email) {
+      throw new Error("The sign-in response did not include an active session.");
+    }
+    const nextSession = {
+      ...session,
+      expires_at: session.expires_at || Math.floor(Date.now() / 1000) + (session.expires_in || 3600)
+    };
+    localStorage.setItem(authStorageKey, JSON.stringify(nextSession));
+    authSession = nextSession;
+    updateAuthUi();
+  }
+
+  function clearAuthSession() {
+    authSession = null;
+    localStorage.removeItem(authStorageKey);
+    updateAuthUi();
+  }
+
+  async function refreshAuthSession() {
+    if (!authSession?.refresh_token) return;
+    if (authSession.expires_at > Math.floor(Date.now() / 1000) + 60) return;
+    try {
+      const session = await requestAuth("/auth/v1/token?grant_type=refresh_token", {
+        refresh_token: authSession.refresh_token
+      });
+      setAuthSession(session);
+    } catch (error) {
+      clearAuthSession();
+      showAuthStatus(`Your session expired. Please sign in again. ${error.message}`, true);
+    }
+  }
+
+  async function restoreAuthSession() {
+    try {
+      const storedSession = localStorage.getItem(authStorageKey);
+      if (storedSession) {
+        authSession = JSON.parse(storedSession);
+        updateAuthUi();
+        await refreshAuthSession();
+      }
+    } catch (error) {
+      clearAuthSession();
+      showAuthStatus(`Could not restore your sign-in: ${error.message}`, true);
+    }
+  }
+
+  async function ensureCommunitySignIn(onSignedIn) {
+    await refreshAuthSession();
+    if (authSession) return true;
+    pendingCommunityAction = onSignedIn;
+    authDialog.showModal();
+    showAuthStatus("Sign in to share a look or post a comment.");
+    return false;
+  }
+
+  async function submitAuth(event) {
+    event.preventDefault();
+    if (!supabaseReady()) {
+      showAuthStatus("Sign-in needs your Supabase project URL and anon key in js/supabase-config.js.", true);
+      return;
+    }
+    const submit = authForm.querySelector("button[type=submit]");
+    submit.disabled = true;
+    showAuthStatus(authMode === "signup" ? "Creating your account..." : "Signing in...");
+    try {
+      const formData = new FormData(authForm);
+      const credentials = {
+        email: formData.get("email").trim(),
+        password: formData.get("password")
+      };
+      const session = authMode === "signup"
+        ? await requestAuth("/auth/v1/signup", credentials)
+        : await requestAuth("/auth/v1/token?grant_type=password", credentials);
+      if (!session.access_token) {
+        showAuthStatus("Check your email to confirm your account, then sign in.");
+        return;
+      }
+      setAuthSession(session);
+      authForm.reset();
+      showAuthStatus("You are signed in.");
+      const pendingAction = pendingCommunityAction;
+      pendingCommunityAction = null;
+      authDialog.close();
+      if (pendingAction) pendingAction();
+    } catch (error) {
+      showAuthStatus(`Could not ${authMode === "signup" ? "create your account" : "sign in"}: ${error.message}`, true);
+    } finally {
+      submit.disabled = false;
+    }
+  }
+
+  async function signOut() {
+    const session = authSession;
+    try {
+      if (session?.access_token && supabaseReady()) {
+        await requestAuth("/auth/v1/logout", {}, session.access_token);
+      }
+      clearAuthSession();
+      showAuthStatus("You have signed out.");
+    } catch (error) {
+      clearAuthSession();
+      showAuthStatus(`Signed out on this device, but the server could not end the session: ${error.message}`, true);
+    }
+  }
 
   function setCommunityStatus(message, isError = false) {
     communityStatus.textContent = [message, storageWarning].filter(Boolean).join(" ");
@@ -236,7 +400,7 @@
       ...options,
       headers: {
         apikey: supabaseKey,
-        Authorization: `Bearer ${supabaseKey}`,
+        Authorization: `Bearer ${authSession?.access_token || supabaseKey}`,
         ...(options.body instanceof File
           ? { "Content-Type": options.body.type }
           : typeof options.body === "string"
@@ -255,6 +419,18 @@
 
   function supabaseReady() {
     return Boolean(supabaseUrl && supabaseKey);
+  }
+
+  function imageContentType(file) {
+    if (["image/jpeg", "image/png", "image/webp"].includes(file.type)) return file.type;
+    if (file.type === "image/jpg") return "image/jpeg";
+    const extension = file.name.toLowerCase().split(".").pop();
+    return {
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      png: "image/png",
+      webp: "image/webp"
+    }[extension];
   }
 
   async function loadCommunity() {
@@ -352,6 +528,7 @@
   async function submitComment(event) {
     event.preventDefault();
     const form = event.currentTarget;
+    if (supabaseReady() && !(await ensureCommunitySignIn(() => form.requestSubmit()))) return;
     const submit = form.querySelector("button[type=submit]");
     submit.disabled = true;
     try {
@@ -387,14 +564,16 @@
 
   async function uploadLook(event) {
     event.preventDefault();
+    if (supabaseReady() && !(await ensureCommunitySignIn(() => uploadForm.requestSubmit()))) return;
     const formData = new FormData(uploadForm);
     const image = formData.get("image");
     if (!(image instanceof File) || !image.size) {
       setCommunityStatus("Choose a picture to upload.", true);
       return;
     }
-    if (!["image/jpeg", "image/png", "image/webp"].includes(image.type) || image.size > imageLimit) {
-      setCommunityStatus("Choose a JPG, PNG, or WebP picture no larger than 5 MB.", true);
+    const contentType = imageContentType(image);
+    if (!contentType || image.size > imageLimit) {
+      setCommunityStatus("Choose a JPEG, PNG, or WebP picture no larger than 5 MB.", true);
       return;
     }
 
@@ -427,13 +606,14 @@
       }
       return;
     }
-    const extension = image.type === "image/jpeg" ? "jpg" : image.type.split("/")[1];
+    const extension = contentType === "image/jpeg" ? "jpg" : contentType.split("/")[1];
     const storagePath = `${crypto.randomUUID()}.${extension}`;
     const encodedPath = storagePath.split("/").map(encodeURIComponent).join("/");
     try {
       await requestSupabase(`/storage/v1/object/${storageBucket}/${encodedPath}`, {
         method: "POST",
-        body: image
+        body: image,
+        headers: { "Content-Type": contentType }
       });
       const imageUrl = `${supabaseUrl}/storage/v1/object/public/${storageBucket}/${encodedPath}`;
       const [look] = await requestSupabase("/rest/v1/community_looks", {
@@ -516,8 +696,27 @@
   });
 
   uploadForm.addEventListener("submit", uploadLook);
+  accountToggle.addEventListener("click", () => {
+    updateAuthUi();
+    authDialog.showModal();
+  });
+  authForm.addEventListener("submit", submitAuth);
+  authModeToggle.addEventListener("click", () => {
+    authMode = authMode === "signin" ? "signup" : "signin";
+    updateAuthUi();
+  });
+  document.getElementById("auth-close").addEventListener("click", () => authDialog.close());
+  document.getElementById("auth-close-account").addEventListener("click", () => authDialog.close());
+  document.getElementById("auth-sign-out").addEventListener("click", signOut);
+  authDialog.addEventListener("click", (event) => {
+    if (event.target === authDialog) authDialog.close();
+  });
+  authDialog.addEventListener("close", () => {
+    if (!authSession) pendingCommunityAction = null;
+  });
   savedImages = readSavedImages();
   updateSaveButtons();
   renderCards();
+  restoreAuthSession();
   loadCommunity();
 })();
