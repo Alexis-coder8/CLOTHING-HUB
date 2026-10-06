@@ -136,96 +136,6 @@ img {
   font-weight: 700;
 }
 
-.account-toggle,
-.auth-mode-toggle {
-  border: 0;
-  background: transparent;
-  color: #71329a;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.account-toggle {
-  padding: 8px 12px;
-  border: 1px solid #e6d8ec;
-  border-radius: 20px;
-  background: #fff;
-}
-
-.auth-dialog {
-  width: min(420px, calc(100% - 32px));
-  margin: auto;
-  padding: 28px;
-  border: 1px solid #e6d8ec;
-  border-radius: 14px;
-  color: #291d30;
-  box-shadow: 0 18px 55px rgba(41, 19, 51, 0.25);
-}
-
-.auth-dialog::backdrop {
-  background: rgba(41, 19, 51, 0.55);
-}
-
-.auth-form,
-.auth-signed-in {
-  display: grid;
-  gap: 14px;
-}
-
-.auth-dialog h2 {
-  color: #321740;
-}
-
-.auth-dialog label {
-  display: grid;
-  gap: 6px;
-  color: #4b4050;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.auth-dialog input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #e5d6eb;
-  border-radius: 7px;
-  font: inherit;
-}
-
-.auth-dialog .community-submit {
-  justify-self: stretch;
-}
-
-.auth-mode-toggle {
-  justify-self: center;
-}
-
-.auth-description,
-.auth-status,
-.auth-signed-in > p:not(.eyebrow) {
-  color: #75697a;
-  font-size: 13px;
-}
-
-.auth-status:empty {
-  display: none;
-}
-
-.auth-status.is-error {
-  color: #a32635;
-}
-
-.auth-close {
-  justify-self: end;
-  border: 0;
-  background: transparent;
-  color: #75697a;
-  font-size: 26px;
-  line-height: 1;
-  cursor: pointer;
-}
-
 /* HERO */
 .hero {
   display: flex;
@@ -572,25 +482,12 @@ img {
 
 .comment-form input,
 .comment-form textarea,
-.upload-form input,
-.upload-form select {
-  width: 100%;
-  padding: 9px 11px;
-  border: 1px solid #e5d6eb;
-  border-radius: 7px;
-  background: #fff;
-  color: #291d30;
-  font: inherit;
-  font-size: 13px;
-}
-
 .comment-form textarea {
   min-height: 66px;
   resize: vertical;
 }
 
-.comment-form button,
-.community-submit {
+.comment-form button {
   justify-self: start;
   padding: 8px 14px;
   border: 0;
@@ -602,58 +499,15 @@ img {
   cursor: pointer;
 }
 
-.community {
-  padding: 55px 8%;
-  background: #fff;
-}
-
-.upload-form {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  width: min(720px, 100%);
-  margin: 0 auto;
-}
-
-.upload-form label {
-  display: grid;
-  gap: 6px;
-  color: #4b4050;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.upload-form .upload-file {
-  grid-column: 1 / -1;
-}
-
-.upload-file input {
-  padding: 8px;
-}
-
-.community-submit {
-  grid-column: 1 / -1;
-  justify-self: center;
-  padding: 11px 20px;
-}
-
 .community-status {
   min-height: 24px;
-  margin: 14px auto 0;
+  margin: 10px 0;
   color: #594960;
   font-size: 13px;
-  text-align: center;
 }
 
 .community-status.is-error {
   color: #a32635;
-}
-
-.community-visibility {
-  margin-top: 5px;
-  color: #75697a;
-  font-size: 12px;
-  text-align: center;
 }
 
 [id="pin-grid"] {
@@ -766,15 +620,6 @@ footer p {
   .pin-grid {
     columns: 2 145px;
     column-gap: 12px;
-  }
-
-  .upload-form {
-    grid-template-columns: 1fr;
-  }
-
-  .upload-form .upload-file,
-  .community-submit {
-    grid-column: auto;
   }
 
   .pin-grid.is-horizontal-gallery .pin-card {
