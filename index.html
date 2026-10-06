@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="description"
+    content="Explore feminine, African, casual, elegant, and corporate fashion inspiration at CHIC VERSE."
+  >
+  <title>CHIC VERSE | Find Your Style</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <header class="navbar">
+    <a class="logo" href="#home">CHIC VERSE</a>
+
+    <nav aria-label="Main navigation">
+      <a href="#home">Home</a>
+      <a href="#inspiration">Fashion</a>
+      <a href="#inspiration">African</a>
+      <a href="#inspiration">Beauty</a>
+      <a href="#about">Lifestyle</a>
+    </nav>
+
+    <div class="header-actions">
+      <form class="search-form" id="search-form" role="search">
+        <input
+          id="site-search"
+          type="search"
+          placeholder="Search styles..."
+          aria-label="Search fashion inspiration"
+        >
+        <button type="submit" aria-label="Search">⌕</button>
+      </form>
+
+      <button
+        class="saved-toggle"
+        id="saved-toggle"
+        type="button"
+        aria-pressed="false"
+      >
+        ♡ <span>Saved</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-content">
+        <p class="eyebrow">Discover your next look</p>
+        <h1>Your Style,<br><span>Your Verse.</span></h1>
+        <p>
+          Fashion inspiration for feminine, African, casual, elegant, and
+          corporate style.
+        </p>
+        <a class="hero-button" href="#inspiration">Explore Inspiration</a>
+      </div>
+    </section>
+
+    <section class="inspiration" id="inspiration">
+      <div class="section-heading">
+        <p class="eyebrow">A little inspiration for every day</p>
+        <h2>Find Your Style</h2>
+        <p>Explore looks, discover ideas, and save your favorites.</p>
+      </div>
+
+      <div class="filter-bar" aria-label="Filter inspiration by style">
+        <button class="filter-chip active" type="button" data-filter="all">
+          All
+        </button>
+        <button class="filter-chip" type="button" data-filter="feminine">
+          Feminine
+        </button>
+        <button class="filter-chip" type="button" data-filter="african">
+          African
+        </button>
+        <button class="filter-chip" type="button" data-filter="casual">
+          Casual
+        </button>
+        <button class="filter-chip" type="button" data-filter="elegant">
+          Elegance
+        </button>
+        <button class="filter-chip" type="button" data-filter="corporate">
+          Corporate
+        </button>
+        <button class="filter-chip" type="button" data-filter="other">
+          Other
+        </button>
+      </div>
+
+      <p class="results-message" id="results-message" aria-live="polite"></p>
+
+      <div class="pin-grid" id="pin-grid">
+        <article class="pin-card" data-categories="feminine" data-search="feminine fashion style outfit">
+          <div class="pin-image">
+            <img src="images/fashion1.jpg" alt="Feminine fashion inspiration">
+            <button class="save-button" type="button" data-save-id="fashion1" aria-label="Save fashion1" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Feminine Style</h3>
+            <p>A look to inspire your wardrobe.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="african" data-search="African fashion print style outfit">
+          <div class="pin-image">
+            <img src="images/fashion2.jpg" alt="African fashion inspiration">
+            <button class="save-button" type="button" data-save-id="fashion2" aria-label="Save fashion2" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>African Inspiration</h3>
+            <p>Celebrate color, pattern, and personal style.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="casual" data-search="casual everyday fashion outfit">
+          <div class="pin-image">
+            <img src="images/fashion3.jpg" alt="Casual fashion inspiration">
+            <button class="save-button" type="button" data-save-id="fashion3" aria-label="Save fashion3" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Everyday Chic</h3>
+            <p>Easy inspiration for a relaxed day.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="african elegant" data-search="African elegant fashion style outfit">
+          <div class="pin-image">
+            <img src="images/fashion4.jpg" alt="African elegant fashion inspiration">
+            <button class="save-button" type="button" data-save-id="fashion4" aria-label="Save fashion4" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>African Elegance</h3>
+            <p>Beautiful style with a confident feel.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="elegant" data-search="elegant fashion outfit style">
+          <div class="pin-image">
+            <img src="images/fashion5.jpg" alt="Elegant fashion inspiration">
+            <button class="save-button" type="button" data-save-id="fashion5" aria-label="Save fashion5" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Timeless Elegance</h3>
+            <p>A polished look for a special occasion.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="corporate" data-search="corporate professional work fashion">
+          <div class="pin-image">
+            <img src="images/fashion6.jpg" alt="Corporate fashion inspiration">
+            <button class="save-button" type="button" data-save-id="fashion6" aria-label="Save fashion6" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Corporate Style</h3>
+            <p>Professional inspiration for the workday.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="corporate" data-search="corporate professional office fashion">
+          <div class="pin-image">
+            <img src="images/fashion7.jpg" alt="Professional corporate outfit inspiration">
+            <button class="save-button" type="button" data-save-id="fashion7" aria-label="Save fashion7" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Workday Look</h3>
+            <p>Ideas for a confident professional outfit.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="feminine" data-search="feminine fashion outfit style">
+          <div class="pin-image">
+            <img src="images/fashion8.jpg" alt="Feminine outfit inspiration">
+            <button class="save-button" type="button" data-save-id="fashion8" aria-label="Save fashion8" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Feminine Inspiration</h3>
+            <p>A fresh look to make your own.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="casual" data-search="casual relaxed everyday fashion">
+          <div class="pin-image">
+            <img src="images/fashion9.jpg" alt="Casual everyday outfit inspiration">
+            <button class="save-button" type="button" data-save-id="fashion9" aria-label="Save fashion9" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Casual Chic</h3>
+            <p>Comfortable style for every day.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="feminine" data-search="feminine fashion outfit style">
+          <div class="pin-image">
+            <img src="images/fashion10.jpg" alt="Feminine style inspiration">
+            <button class="save-button" type="button" data-save-id="fashion10" aria-label="Save fashion10" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Soft &amp; Feminine</h3>
+            <p>Style inspiration for a lovely look.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="casual" data-search="casual relaxed everyday outfit">
+          <div class="pin-image">
+            <img src="images/fashion11.jpg" alt="Relaxed casual fashion inspiration">
+            <button class="save-button" type="button" data-save-id="fashion11" aria-label="Save fashion11" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Relaxed &amp; Chic</h3>
+            <p>Easygoing inspiration for your day.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="other" data-search="additional fashion inspiration">
+          <div class="pin-image">
+            <img src="images/fashion12.jpg" alt="Additional fashion inspiration">
+            <button class="save-button" type="button" data-save-id="fashion12" aria-label="Save fashion12" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>More Inspiration</h3>
+            <p>Extra style inspiration to explore.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="corporate" data-search="corporate professional work fashion">
+          <div class="pin-image">
+            <img src="images/fashion13.jpg" alt="Corporate outfit inspiration">
+            <button class="save-button" type="button" data-save-id="fashion13" aria-label="Save fashion13" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Professional Polish</h3>
+            <p>Smart inspiration for work and meetings.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="african" data-search="African fashion outfit style">
+          <div class="pin-image">
+            <img src="images/fashion14.jpg" alt="African fashion outfit inspiration">
+            <button class="save-button" type="button" data-save-id="fashion14" aria-label="Save fashion14" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>African Style</h3>
+            <p>Inspiration celebrating African fashion.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="casual" data-search="casual everyday relaxed fashion">
+          <div class="pin-image">
+            <img src="images/fashion15.jpg" alt="Casual fashion look">
+            <button class="save-button" type="button" data-save-id="fashion15" aria-label="Save fashion15" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Everyday Look</h3>
+            <p>Casual inspiration for your wardrobe.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="african" data-search="African fashion outfit print style">
+          <div class="pin-image">
+            <img src="images/fashion16.jpg" alt="African fashion style inspiration">
+            <button class="save-button" type="button" data-save-id="fashion16" aria-label="Save fashion16" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>African Inspiration</h3>
+            <p>Discover another beautiful look.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="african" data-search="African fashion outfit style">
+          <div class="pin-image">
+            <img src="images/fashion17.jpg" alt="African outfit inspiration">
+            <button class="save-button" type="button" data-save-id="fashion17" aria-label="Save fashion17" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Inspired by Africa</h3>
+            <p>Personal style with a vibrant spirit.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="african" data-search="African fashion colorful outfit style">
+          <div class="pin-image">
+            <img src="images/fashion18.jpg" alt="Colorful African fashion inspiration">
+            <button class="save-button" type="button" data-save-id="fashion18" aria-label="Save fashion18" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Colorful Inspiration</h3>
+            <p>Explore expressive African fashion.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="feminine" data-search="feminine fashion style outfit">
+          <div class="pin-image">
+            <img src="images/fashion19.jpg" alt="Feminine fashion look">
+            <button class="save-button" type="button" data-save-id="fashion19" aria-label="Save fashion19" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Feminine Look</h3>
+            <p>Inspiration for your personal style.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="african" data-search="African fashion outfit style">
+          <div class="pin-image">
+            <img src="images/fashion20.jpg" alt="African style inspiration">
+            <button class="save-button" type="button" data-save-id="fashion20" aria-label="Save fashion20" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>African Style</h3>
+            <p>A look to add to your inspiration board.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="feminine" data-search="feminine fashion outfit style">
+          <div class="pin-image">
+            <img src="images/fashion21.jpg" alt="Feminine outfit style inspiration">
+            <button class="save-button" type="button" data-save-id="fashion21" aria-label="Save fashion21" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Lovely Details</h3>
+            <p>Feminine inspiration for your next look.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="african" data-search="African fashion outfit style">
+          <div class="pin-image">
+            <img src="images/fashion22.jpg" alt="African fashion outfit">
+            <button class="save-button" type="button" data-save-id="fashion22" aria-label="Save fashion22" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>African Fashion</h3>
+            <p>Celebrate your style and individuality.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="feminine" data-search="feminine fashion style outfit">
+          <div class="pin-image">
+            <img src="images/fashion23.jpg" alt="Feminine style and fashion inspiration">
+            <button class="save-button" type="button" data-save-id="fashion23" aria-label="Save fashion23" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Everyday Feminine</h3>
+            <p>A little inspiration for your everyday style.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="casual" data-search="casual relaxed everyday fashion">
+          <div class="pin-image">
+            <img src="images/fashion24.jpg" alt="Casual outfit inspiration">
+            <button class="save-button" type="button" data-save-id="fashion24" aria-label="Save fashion24" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Casual Outfit</h3>
+            <p>Comfortable inspiration for everyday wear.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="african" data-search="African fashion traditional outfit style">
+          <div class="pin-image">
+            <img src="images/fashion25.jpg" alt="African fashion outfit inspiration">
+            <button class="save-button" type="button" data-save-id="fashion25" aria-label="Save fashion25" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>African Elegance</h3>
+            <p>A beautiful look inspired by African fashion.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="african" data-search="African fashion traditional colorful outfit">
+          <div class="pin-image">
+            <img src="images/fashion26.jpg" alt="Colorful African outfit inspiration">
+            <button class="save-button" type="button" data-save-id="fashion26" aria-label="Save fashion26" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Color &amp; Culture</h3>
+            <p>Discover another African-inspired look.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="african" data-search="African fashion outfit style">
+          <div class="pin-image">
+            <img src="images/fashion27.jpg" alt="African fashion inspiration">
+            <button class="save-button" type="button" data-save-id="fashion27" aria-label="Save fashion27" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>African Inspiration</h3>
+            <p>A style idea to save and revisit.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="african" data-search="African fashion colorful outfit style">
+          <div class="pin-image">
+            <img src="images/fashion28.jpg" alt="Colorful African fashion look">
+            <button class="save-button" type="button" data-save-id="fashion28" aria-label="Save fashion28" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Bold &amp; Beautiful</h3>
+            <p>Expressive style with plenty of personality.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="african" data-search="African fashion traditional outfit style">
+          <div class="pin-image">
+            <img src="images/fashion29.jpg" alt="African outfit style inspiration">
+            <button class="save-button" type="button" data-save-id="fashion29" aria-label="Save fashion29" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Beautifully African</h3>
+            <p>More fashion inspiration to explore.</p>
+          </div>
+        </article>
+
+        <article class="pin-card" data-categories="elegant" data-search="elegant formal fashion outfit style">
+          <div class="pin-image">
+            <img src="images/fashion30.jpg" alt="Elegant formal fashion inspiration">
+            <button class="save-button" type="button" data-save-id="fashion30" aria-label="Save fashion30" aria-pressed="false">♡</button>
+          </div>
+          <div class="pin-info">
+            <h3>Elegant Look</h3>
+            <p>Refined inspiration for a polished outfit.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="about" id="about">
+      <p class="eyebrow">Welcome to your CHIC VERSE</p>
+      <h2>Discover. Inspire. Be Chic.</h2>
+      <p>
+        CHIC VERSE celebrates feminine style, African fashion, casual looks,
+        timeless elegance, and professional outfits.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <a class="logo" href="#home">CHIC VERSE</a>
+    <p>Discover. Inspire. Be Chic.</p>
+    <p>&copy; 2026 CHIC VERSE</p>
+  </footer>
+
+  <script>
+    (() => {
+      const cards = Array.from(document.querySelectorAll(".pin-card"));
+      const filterButtons = Array.from(document.querySelectorAll("[data-filter]"));
+      const searchForm = document.getElementById("search-form");
+      const searchInput = document.getElementById("site-search");
+      const savedToggle = document.getElementById("saved-toggle");
+      const resultsMessage = document.getElementById("results-message");
+      const savedStorageKey = "chicVerseSavedImages";
+
+      let activeFilter = "all";
+      let showSavedOnly = false;
+      let savedImages = new Set();
+
+      try {
+        const storedImages = JSON.parse(localStorage.getItem(savedStorageKey) || "[]");
+        if (Array.isArray(storedImages)) {
+          savedImages = new Set(storedImages);
+        }
+      } catch {
+        savedImages = new Set();
+      }
+
+      function updateSaveButtons() {
+        document.querySelectorAll(".save-button").forEach((button) => {
+          const isSaved = savedImages.has(button.dataset.saveId);
+          button.classList.toggle("saved", isSaved);
+          button.setAttribute("aria-pressed", String(isSaved));
+          button.textContent = isSaved ? "♥" : "♡";
+        });
+      }
+
+      function renderCards() {
+        const query = searchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+
+        cards.forEach((card) => {
+          const categories = (card.dataset.categories || "").split(/\s+/);
+          const searchableText = (
+            (card.dataset.search || "") + " " + card.textContent
+          ).toLowerCase();
+          const imageId = card.querySelector(".save-button").dataset.saveId;
+
+          const matchesCategory =
+            activeFilter === "all" || categories.includes(activeFilter);
+          const matchesSearch =
+            query === "" || searchableText.includes(query);
+          const matchesSaved =
+            !showSavedOnly || savedImages.has(imageId);
+          const isVisible = matchesCategory && matchesSearch && matchesSaved;
+
+          card.hidden = !isVisible;
+          if (isVisible) visibleCount += 1;
+        });
+
+        if (visibleCount === 0) {
+          resultsMessage.textContent = "No inspiration found. Try another search or filter.";
+        } else {
+          resultsMessage.textContent = `${visibleCount} ${
+            visibleCount === 1 ? "look" : "looks"
+          }`;
+        }
+      }
+
+      filterButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          activeFilter = button.dataset.filter;
+          filterButtons.forEach((item) => {
+            item.classList.toggle("active", item === button);
+          });
+          showSavedOnly = false;
+          savedToggle.classList.remove("active");
+          savedToggle.setAttribute("aria-pressed", "false");
+          renderCards();
+        });
+      });
+
+      searchInput.addEventListener("input", renderCards);
+
+      searchForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        renderCards();
+      });
+
+      document.querySelectorAll(".save-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          const imageId = button.dataset.saveId;
+
+          if (savedImages.has(imageId)) {
+            savedImages.delete(imageId);
+          } else {
+            savedImages.add(imageId);
+          }
+
+          try {
+            localStorage.setItem(savedStorageKey, JSON.stringify([...savedImages]));
+          } catch {
+            // Saved hearts still work for this page view if browser storage is unavailable.
+          }
+
+          updateSaveButtons();
+          renderCards();
+        });
+      });
+
+      savedToggle.addEventListener("click", () => {
+        showSavedOnly = !showSavedOnly;
+        savedToggle.classList.toggle("active", showSavedOnly);
+        savedToggle.setAttribute("aria-pressed", String(showSavedOnly));
+        renderCards();
+      });
+
+      updateSaveButtons();
+      renderCards();
+    })();
+  </script>
+</body>
+</html>
