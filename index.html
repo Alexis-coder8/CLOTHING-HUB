@@ -20,6 +20,7 @@
       <a href="#inspiration">Fashion</a>
       <a href="#inspiration">African</a>
       <a href="#inspiration">Beauty</a>
+      <a href="#community">Community</a>
       <a href="#about">Lifestyle</a>
     </nav>
 
@@ -575,6 +576,46 @@
       </div>
     </section>
 
+    <section class="community" id="community">
+      <div class="section-heading">
+        <p class="eyebrow">Made by you</p>
+        <h2>Share Your Look</h2>
+        <p>Upload an outfit and join the conversation with the LUVERIA community.</p>
+      </div>
+      <form class="upload-form" id="upload-form">
+        <label>
+          Your name
+          <input name="name" type="text" maxlength="40" autocomplete="name" required>
+        </label>
+        <label>
+          Look title
+          <input name="title" type="text" maxlength="80" required>
+        </label>
+        <label>
+          Style
+          <select name="category" required>
+            <option value="elegant">Elegant</option>
+            <option value="african">African</option>
+            <option value="corporate">Corporate</option>
+            <option value="casual">Casual</option>
+            <option value="feminine">Feminine</option>
+            <option value="old-money">Old Money</option>
+            <option value="university">University</option>
+            <option value="romantic">Romantic</option>
+            <option value="streetwear">Streetwear</option>
+            <option value="cozy">Cozy</option>
+          </select>
+        </label>
+        <label class="upload-file">
+          Picture (JPG, PNG, or WebP; max 5 MB)
+          <input name="image" type="file" accept="image/jpeg,image/png,image/webp" required>
+        </label>
+        <button class="community-submit" type="submit">Share your look</button>
+      </form>
+      <p class="community-status" id="community-status" aria-live="polite"></p>
+      <p class="community-visibility">Shared looks and comments are public and visible to everyone.</p>
+    </section>
+
     <section class="about" id="about">
       <p class="eyebrow">Welcome to your LUVERIA</p>
       <h2>Discover. Inspire. Be Chic.</h2>
@@ -592,149 +633,7 @@
     <p>&copy; 2026 LUVERIA</p>
   </footer>
 
-  <script>
-    (() => {
-      const cards = Array.from(document.querySelectorAll(".pin-card"));
-      const filterButtons = Array.from(document.querySelectorAll("[data-filter]"));
-      const searchForm = document.getElementById("search-form");
-      const searchInput = document.getElementById("site-search");
-      const savedToggle = document.getElementById("saved-toggle");
-      const resultsMessage = document.getElementById("results-message");
-      const filterBar = document.querySelector(".filter-bar");
-      const pinGrid = document.getElementById("pin-grid");
-      const savedStorageKey = "chicVerseSavedImages";
-
-      let activeFilter = "all";
-      let showSavedOnly = false;
-      let savedImages = new Set();
-
-      document.querySelectorAll(".style-category").forEach((category) => {
-        const categoryName = category.dataset.filter;
-        const collage = category.querySelector(".category-collage");
-        const previews = cards.filter((card) =>
-          (card.dataset.categories || "").split(/\s+/).includes(categoryName)
-        );
-
-        previews.slice(0, 4).forEach((card) => {
-          const image = card.querySelector(".pin-image img").cloneNode();
-          image.alt = "";
-          collage.append(image);
-        });
-        collage.classList.toggle("category-collage--three", collage.childElementCount === 3);
-      });
-
-      try {
-        const storedImages = JSON.parse(localStorage.getItem(savedStorageKey) || "[]");
-        if (Array.isArray(storedImages)) {
-          savedImages = new Set(storedImages);
-        }
-      } catch {
-        savedImages = new Set();
-      }
-
-      function updateSaveButtons() {
-        document.querySelectorAll(".save-button").forEach((button) => {
-          const isSaved = savedImages.has(button.dataset.saveId);
-          button.classList.toggle("saved", isSaved);
-          button.setAttribute("aria-pressed", String(isSaved));
-          button.textContent = isSaved ? "♥" : "♡";
-        });
-      }
-
-      function renderCards() {
-        const query = searchInput.value.trim().toLowerCase();
-        const isOverview =
-          activeFilter === "all" && query === "" && !showSavedOnly;
-        let visibleCount = 0;
-        pinGrid.classList.toggle("is-horizontal-gallery", activeFilter !== "all");
-        filterBar.hidden = isOverview;
-        resultsMessage.hidden = isOverview;
-        pinGrid.hidden = isOverview;
-
-        cards.forEach((card) => {
-          const categories = (card.dataset.categories || "").split(/\s+/);
-          const searchableText =
-            ((card.dataset.search || "") + " " + card.textContent).toLowerCase();
-          const imageId = card.querySelector(".save-button").dataset.saveId;
-
-          const matchesCategory =
-            activeFilter === "all" || categories.includes(activeFilter);
-          const matchesSearch =
-            query === "" || searchableText.includes(query);
-          const matchesSaved =
-            !showSavedOnly || savedImages.has(imageId);
-          const isVisible = matchesCategory && matchesSearch && matchesSaved;
-
-          card.hidden = !isVisible;
-          if (isVisible) visibleCount += 1;
-        });
-
-        resultsMessage.textContent = visibleCount === 0
-          ? "No inspiration found. Try another search or filter."
-          : `${visibleCount} ${visibleCount === 1 ? "look" : "looks"}`;
-      }
-
-      filterButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          activeFilter = button.dataset.filter;
-
-          filterButtons.forEach((item) => {
-            const isActive = item.dataset.filter === activeFilter;
-            item.classList.toggle("active", isActive);
-            if (item.classList.contains("style-category")) {
-              item.setAttribute("aria-pressed", String(isActive));
-            }
-          });
-          document.querySelector(".pin-grid").scrollLeft = 0;
-
-          showSavedOnly = false;
-          savedToggle.classList.remove("active");
-          savedToggle.setAttribute("aria-pressed", "false");
-          renderCards();
-          if (button.classList.contains("style-category")) {
-            pinGrid.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
-        });
-      });
-
-      searchInput.addEventListener("input", renderCards);
-
-      searchForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        renderCards();
-      });
-
-      document.querySelectorAll(".save-button").forEach((button) => {
-        button.addEventListener("click", () => {
-          const imageId = button.dataset.saveId;
-
-          if (savedImages.has(imageId)) {
-            savedImages.delete(imageId);
-          } else {
-            savedImages.add(imageId);
-          }
-
-          try {
-            localStorage.setItem(savedStorageKey, JSON.stringify([...savedImages]));
-          } catch {
-            // Saved hearts still work for this page view if storage is unavailable.
-          }
-
-          updateSaveButtons();
-          renderCards();
-        });
-      });
-
-      savedToggle.addEventListener("click", () => {
-        showSavedOnly = !showSavedOnly;
-        savedToggle.classList.toggle("active", showSavedOnly);
-        savedToggle.setAttribute("aria-pressed", String(showSavedOnly));
-        renderCards();
-      });
-
-      updateSaveButtons();
-      renderCards();
-    })();
-  </script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/script.js"></script>
 </body>
 </html>

@@ -370,6 +370,7 @@ img {
   background: #fff;
   box-shadow: 0 5px 18px rgba(50, 23, 64, 0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  scroll-margin-top: 140px;
 }
 
 .pin-grid.is-horizontal-gallery .pin-card {
@@ -435,6 +436,138 @@ img {
 .pin-info p {
   color: #75697a;
   font-size: 13px;
+}
+
+.pin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.download-link {
+  color: #71329a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.download-link:hover {
+  text-decoration: underline;
+}
+
+.look-community {
+  padding: 0 15px 15px;
+}
+
+.comment-list {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.comment {
+  overflow-wrap: anywhere;
+  color: #594960;
+  font-size: 12px;
+}
+
+.comment strong {
+  color: #321740;
+}
+
+.comment-form {
+  display: grid;
+  gap: 8px;
+}
+
+.comment-form input,
+.comment-form textarea,
+.upload-form input,
+.upload-form select {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid #e5d6eb;
+  border-radius: 7px;
+  background: #fff;
+  color: #291d30;
+  font: inherit;
+  font-size: 13px;
+}
+
+.comment-form textarea {
+  min-height: 66px;
+  resize: vertical;
+}
+
+.comment-form button,
+.community-submit {
+  justify-self: start;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 7px;
+  background: #71329a;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.community {
+  padding: 55px 8%;
+  background: #fff;
+}
+
+.upload-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  width: min(720px, 100%);
+  margin: 0 auto;
+}
+
+.upload-form label {
+  display: grid;
+  gap: 6px;
+  color: #4b4050;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.upload-form .upload-file {
+  grid-column: 1 / -1;
+}
+
+.upload-file input {
+  padding: 8px;
+}
+
+.community-submit {
+  grid-column: 1 / -1;
+  justify-self: center;
+  padding: 11px 20px;
+}
+
+.community-status {
+  min-height: 24px;
+  margin: 14px auto 0;
+  color: #594960;
+  font-size: 13px;
+  text-align: center;
+}
+
+.community-status.is-error {
+  color: #a32635;
+}
+
+.community-visibility {
+  margin-top: 5px;
+  color: #75697a;
+  font-size: 12px;
+  text-align: center;
+}
+
+[id="pin-grid"] {
+  scroll-margin-top: 140px;
 }
 
 /* Important: ensures filtered cards really disappear */
@@ -543,6 +676,15 @@ footer p {
   .pin-grid {
     columns: 2 145px;
     column-gap: 12px;
+  }
+
+  .upload-form {
+    grid-template-columns: 1fr;
+  }
+
+  .upload-form .upload-file,
+  .community-submit {
+    grid-column: auto;
   }
 
   .pin-grid.is-horizontal-gallery .pin-card {
