@@ -10,6 +10,7 @@
   const uploadForm = document.getElementById("upload-form");
   const communityStatus = document.getElementById("community-status");
   const savedStorageKey = "chicVerseSavedImages";
+  const localDatabaseName = "luveria-community";
   const supabaseUrl = window.LUVERIA_SUPABASE_URL.replace(/\/+$/, "");
   const supabaseKey = window.LUVERIA_SUPABASE_ANON_KEY;
   const storageBucket = "luveria-looks";
@@ -21,6 +22,7 @@
   let savedImages = new Set();
   let sharedComments = [];
   let storageWarning = "";
+  let localDatabasePromise;
 
   function setCommunityStatus(message, isError = false) {
     communityStatus.textContent = [message, storageWarning].filter(Boolean).join(" ");
@@ -61,15 +63,19 @@
     });
   }
 
-  function createDownloadLink(image) {
+  function createDownloadLink(image, downloadName) {
     const link = document.createElement("a");
     link.className = "download-link";
     link.href = image.src;
-    link.download = image.src.split("/").pop().split("?")[0] || "luveria-look";
+    link.download = downloadName || image.src.split("/").pop().split("?")[0] || "luveria-look";
     link.textContent = "Download picture";
     link.setAttribute("aria-label", `Download ${image.alt || "look"}`);
     link.addEventListener("click", async (event) => {
-      if (window.location.protocol === "file:" || image.src.startsWith(window.location.origin)) return;
+      if (
+        window.location.protocol === "file:"
+        || image.src.startsWith(window.location.origin)
+        || image.src.startsWith("blob:")
+      ) return;
       event.preventDefault();
       try {
         const response = await fetch(image.src);
@@ -78,8 +84,10 @@
         const download = document.createElement("a");
         download.href = objectUrl;
         download.download = link.download;
+        document.body.append(download);
         download.click();
-        window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+        download.remove();
+        window.setTimeout(() => URL.revokeObjectURL(objectUrl), 10000);
       } catch (error) {
         setCommunityStatus(error.message, true);
       }
@@ -131,13 +139,13 @@
       });
   }
 
-  function addLookCommunity(card, lookId) {
+  function addLookCommunity(card, lookId, downloadName) {
     card.dataset.communityId = lookId;
     const info = card.querySelector(".pin-info");
     const image = card.querySelector(".pin-image img");
     const actions = document.createElement("div");
     actions.className = "pin-actions";
-    actions.append(createDownloadLink(image));
+    actions.append(createDownloadLink(image, downloadName));
     info.append(actions);
 
     const community = document.createElement("div");
@@ -159,7 +167,7 @@
     const imageWrap = document.createElement("div");
     imageWrap.className = "pin-image";
     const image = document.createElement("img");
-    image.src = look.image_url;
+    image.src = look.image_blob ? URL.createObjectURL(look.image_blob) : look.image_url;
     image.alt = `${look.title} fashion look`;
 
     const saveButton = document.createElement("button");
@@ -181,8 +189,46 @@
     info.append(title, description);
 
     card.append(imageWrap, info);
-    addLookCommunity(card, look.id);
+    addLookCommunity(card, look.id, look.download_name);
     return card;
+  }
+
+  function openLocalDatabase() {
+    if (!localDatabasePromise) {
+      localDatabasePromise = new Promise((resolve, reject) => {
+        const request = indexedDB.open(localDatabaseName, 1);
+        request.onupgradeneeded = () => {
+          const database = request.result;
+          database.createObjectStore("looks", { keyPath: "id" });
+          const comments = database.createObjectStore("comments", { keyPath: "id" });
+          comments.createIndex("look_id", "look_id");
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error || new Error("Could not open local community storage."));
+        request.onblocked = () => reject(new Error("Local community storage is blocked by another tab."));
+      });
+    }
+    return localDatabasePromise;
+  }
+
+  async function readLocalStore(storeName) {
+    const database = await openLocalDatabase();
+    return new Promise((resolve, reject) => {
+      const request = database.transaction(storeName, "readonly").objectStore(storeName).getAll();
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error || new Error("Could not read local community data."));
+    });
+  }
+
+  async function writeLocalStore(storeName, item) {
+    const database = await openLocalDatabase();
+    return new Promise((resolve, reject) => {
+      const transaction = database.transaction(storeName, "readwrite");
+      transaction.objectStore(storeName).put(item);
+      transaction.oncomplete = resolve;
+      transaction.onerror = () => reject(transaction.error || new Error("Could not save local community data."));
+      transaction.onabort = () => reject(transaction.error || new Error("Saving local community data was cancelled."));
+    });
   }
 
   async function requestSupabase(path, options = {}) {
@@ -213,8 +259,28 @@
 
   async function loadCommunity() {
     if (!supabaseReady()) {
-      uploadForm.querySelector("button[type=submit]").disabled = true;
-      setCommunityStatus("Community sharing needs Supabase setup. Add your project URL and anon key in js/supabase-config.js.");
+      try {
+        const [looks, comments] = await Promise.all([
+          readLocalStore("looks"),
+          readLocalStore("comments")
+        ]);
+        sharedComments = comments;
+        looks.sort((left, right) => right.created_at.localeCompare(left.created_at))
+          .forEach((look) => {
+            const card = buildCommunityCard(look);
+            pinGrid.prepend(card);
+            cards.push(card);
+          });
+        document.querySelectorAll(".look-community .comment-list").forEach((list) => {
+          renderComments(list, list.closest(".pin-card").dataset.communityId);
+        });
+        updateSaveButtons();
+        renderCards();
+        setCommunityStatus("Community sharing is saved only in this browser. Add Supabase settings to share with everyone.");
+      } catch (error) {
+        uploadForm.querySelector("button[type=submit]").disabled = true;
+        setCommunityStatus(`Could not open local community storage: ${error.message}`, true);
+      }
       return;
     }
     try {
@@ -266,8 +332,12 @@
     });
 
     resultsMessage.textContent = visibleCount === 0
-      ? "No inspiration found. Try another search or filter."
-      : `${visibleCount} ${visibleCount === 1 ? "look" : "looks"}`;
+      ? showSavedOnly
+        ? "No saved pictures yet. Tap the heart on a look to save it here."
+        : "No inspiration found. Try another search or filter."
+      : showSavedOnly
+        ? `${visibleCount} saved ${visibleCount === 1 ? "picture" : "pictures"}`
+        : `${visibleCount} ${visibleCount === 1 ? "look" : "looks"}`;
   }
 
   function toggleSavedLook(event) {
@@ -283,26 +353,31 @@
     event.preventDefault();
     const form = event.currentTarget;
     const submit = form.querySelector("button[type=submit]");
-    if (!supabaseReady()) {
-      setCommunityStatus("Add your Supabase project URL and anon key before posting comments.", true);
-      return;
-    }
     submit.disabled = true;
     try {
       const formData = new FormData(form);
-      const [comment] = await requestSupabase("/rest/v1/community_comments", {
-        method: "POST",
-        headers: { Prefer: "return=representation" },
-        body: JSON.stringify({
-          look_id: form.dataset.lookId,
-          display_name: formData.get("name").trim(),
-          body: formData.get("message").trim()
-        })
-      });
+      const commentData = {
+        look_id: form.dataset.lookId,
+        display_name: formData.get("name").trim(),
+        body: formData.get("message").trim()
+      };
+      let comment;
+      if (supabaseReady()) {
+        [comment] = await requestSupabase("/rest/v1/community_comments", {
+          method: "POST",
+          headers: { Prefer: "return=representation" },
+          body: JSON.stringify(commentData)
+        });
+      } else {
+        comment = { id: crypto.randomUUID(), ...commentData, created_at: new Date().toISOString() };
+        await writeLocalStore("comments", comment);
+      }
       sharedComments.push(comment);
       renderComments(form.previousElementSibling, form.dataset.lookId);
       form.reset();
-      setCommunityStatus("Your comment has been shared.");
+      setCommunityStatus(supabaseReady()
+        ? "Your comment has been shared."
+        : "Your comment has been saved in this browser only.");
     } catch (error) {
       setCommunityStatus(`Could not post comment: ${error.message}`, true);
     } finally {
@@ -312,10 +387,6 @@
 
   async function uploadLook(event) {
     event.preventDefault();
-    if (!supabaseReady()) {
-      setCommunityStatus("Add your Supabase project URL and anon key before uploading.", true);
-      return;
-    }
     const formData = new FormData(uploadForm);
     const image = formData.get("image");
     if (!(image instanceof File) || !image.size) {
@@ -330,6 +401,32 @@
     const submit = uploadForm.querySelector("button[type=submit]");
     submit.disabled = true;
     setCommunityStatus("Uploading your look...");
+    if (!supabaseReady()) {
+      const look = {
+        id: crypto.randomUUID(),
+        display_name: formData.get("name").trim(),
+        title: formData.get("title").trim(),
+        category: formData.get("category"),
+        image_blob: image,
+        download_name: image.name,
+        created_at: new Date().toISOString()
+      };
+      try {
+        await writeLocalStore("looks", look);
+        const card = buildCommunityCard(look);
+        pinGrid.prepend(card);
+        cards.push(card);
+        uploadForm.reset();
+        updateSaveButtons();
+        renderCards();
+        setCommunityStatus("Your look has been saved in this browser only.");
+      } catch (error) {
+        setCommunityStatus(`Could not save your look: ${error.message}`, true);
+      } finally {
+        submit.disabled = false;
+      }
+      return;
+    }
     const extension = image.type === "image/jpeg" ? "jpg" : image.type.split("/")[1];
     const storagePath = `${crypto.randomUUID()}.${extension}`;
     const encodedPath = storagePath.split("/").map(encodeURIComponent).join("/");
