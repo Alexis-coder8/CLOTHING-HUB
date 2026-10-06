@@ -65,19 +65,40 @@
     link.className = "download-link";
     link.href = image.src;
     link.download = downloadName || image.src.split("/").pop().split("?")[0] || "luveria-look";
-    link.textContent = "Download picture";
-    link.setAttribute("aria-label", `Download ${image.alt || "look"}`);
+    link.textContent = "Download / save picture";
+    link.setAttribute("aria-label", `Download or save ${image.alt || "look"} to your device`);
     link.addEventListener("click", async (event) => {
-      if (
-        window.location.protocol === "file:"
-        || image.src.startsWith(window.location.origin)
-        || image.src.startsWith("blob:")
-      ) return;
+      if (window.location.protocol === "file:") return;
+      const supportsFileSharing = typeof navigator.share === "function"
+        && typeof navigator.canShare === "function";
+      const sameOrigin = image.src.startsWith(window.location.origin) || image.src.startsWith("blob:");
+      if (!supportsFileSharing && sameOrigin) return;
       event.preventDefault();
       try {
         const response = await fetch(image.src);
         if (!response.ok) throw new Error(`Download failed (${response.status}).`);
-        const objectUrl = URL.createObjectURL(await response.blob());
+        const blob = await response.blob();
+        const mimeType = blob.type
+          || (/\.jpe?g$/i.test(link.download) ? "image/jpeg" : "")
+          || (/\.png$/i.test(link.download) ? "image/png" : "")
+          || (/\.webp$/i.test(link.download) ? "image/webp" : "application/octet-stream");
+        if (supportsFileSharing) {
+          const file = new File([blob], link.download, { type: mimeType });
+          if (navigator.canShare({ files: [file] })) {
+            try {
+              await navigator.share({
+                files: [file],
+                title: "LUVERIA",
+                text: "Choose Save Image or Save to Photos/Gallery to keep this picture."
+              });
+              setCommunityStatus("Picture shared. Choose a save option in the share menu to add it to your gallery.");
+              return;
+            } catch (error) {
+              if (error.name === "AbortError") return;
+            }
+          }
+        }
+        const objectUrl = URL.createObjectURL(blob);
         const download = document.createElement("a");
         download.href = objectUrl;
         download.download = link.download;
@@ -86,6 +107,7 @@
         download.remove();
         window.setTimeout(() => URL.revokeObjectURL(objectUrl), 10000);
       } catch (error) {
+        if (error.name === "AbortError") return;
         setCommunityStatus(error.message, true);
       }
     });
